@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:pass_generator/initial_data_settings.dart';
+import 'package:pass_generator/main.dart';
 
 typedef IntValueSetter = void Function(int value);
 
@@ -41,7 +43,7 @@ class RangeTextFormField extends StatelessWidget {
   }
 }
 
-class CheckboxSettingFormField extends StatelessWidget {
+class CheckboxSettingFormField extends StatefulWidget {
   const CheckboxSettingFormField(
       {Key? key,
       required this.labelText,
@@ -56,45 +58,53 @@ class CheckboxSettingFormField extends StatelessWidget {
   final BoolValueSetter boolValueSetter;
 
   @override
+  State<StatefulWidget> createState() => _CheckboxSettingFormField();
+}
+
+class _CheckboxSettingFormField extends State<CheckboxSettingFormField> {
+  late bool _isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    _isChecked = widget.initialValue;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Checkbox(
-          value: initialValue,
+          value: _isChecked,
           onChanged: (bool? value) {
-            boolValueSetter(value ?? false);
+            widget.boolValueSetter(value ?? false);
+
+            setState(() {
+              _isChecked = value!;
+            });
+
+            // context.refresh(randomizerProvider);
+            print(context.read(randomizerProvider).symbols);
           },
         ),
-        Text(labelText, style: Theme.of(context).textTheme.subtitle1),
+        Text(widget.labelText, style: Theme.of(context).textTheme.subtitle1),
       ],
     );
   }
 }
 
-class SettingsForm extends StatelessWidget {
+class SettingsForm extends ConsumerWidget {
   SettingsForm({
     Key? key,
     required this.formKey,
-    required this.intValueSetter,
-    required this.lowercaseValueSetter,
-    required this.uppercaseValueSetter,
-    required this.symbolsValueSetter,
-    required this.numbersValueSetter,
   }) : super(key: key);
 
   final GlobalKey<FormState> formKey;
 
-  final IntValueSetter intValueSetter;
-
-  final BoolValueSetter lowercaseValueSetter;
-  final BoolValueSetter uppercaseValueSetter;
-  final BoolValueSetter symbolsValueSetter;
-  final BoolValueSetter numbersValueSetter;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader ref) {
     return Form(
       key: formKey,
       child: Padding(
@@ -104,26 +114,47 @@ class SettingsForm extends StatelessWidget {
           children: [
             RangeTextFormField(
               labelText: 'Length of Password',
-              intValueSetter: intValueSetter,
-              initialValue: InitialDataSettings.length,
+              intValueSetter: (value) =>
+                  context.read(randomizerProvider).length = value,
+              initialValue: context.read(randomizerProvider).length,
             ),
             SizedBox(height: 12),
             CheckboxSettingFormField(
               labelText: 'Lowercase Letters',
-              boolValueSetter: lowercaseValueSetter,
+              boolValueSetter: (value) => {
+                ref(randomizerProvider).lowercase = value,
+                InitialDataSettings.lowercase = value
+              },
               initialValue: InitialDataSettings.lowercase,
             ),
             CheckboxSettingFormField(
                 labelText: 'Uppercase Letters',
-                boolValueSetter: uppercaseValueSetter,
-                initialValue: InitialDataSettings.uppercase),
+                boolValueSetter: (value) => {
+                      ref(randomizerProvider).uppercase = value,
+                      InitialDataSettings.uppercase = value
+                    },
+                initialValue: ref(randomizerProvider).uppercase),
+/*            CheckboxListTile(
+              value: ref(randomizerProvider).symbols,
+              onChanged: (value) =>
+                  {ref(randomizerProvider).symbols = value ?? false},
+              title: Text('Symbols'),
+            ),*/
             CheckboxSettingFormField(
                 labelText: 'Symbols',
-                boolValueSetter: symbolsValueSetter,
-                initialValue: InitialDataSettings.symbols),
+                boolValueSetter: (value) => {
+                      ref(randomizerProvider).symbols = value,
+                      context.read(randomizerProvider).symbols = value,
+                      InitialDataSettings.symbols = value,
+                    },
+                initialValue: ref(randomizerProvider).symbols),
             CheckboxSettingFormField(
                 labelText: 'Numbers',
-                boolValueSetter: numbersValueSetter,
+                boolValueSetter: (value) => {
+                      ref(randomizerProvider).numbers = value,
+                      context.read(randomizerProvider).numbers = value,
+                      InitialDataSettings.numbers = value
+                    },
                 initialValue: InitialDataSettings.numbers),
           ],
         ),

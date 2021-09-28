@@ -9,9 +9,13 @@ class RandomizerChangeNotifier extends ChangeNotifier {
 
   int length = 8;
 
-  bool uppercase = true, lowercase = true, numbers = true, symbols = true;
+  bool uppercase = true;
+  bool lowercase = true;
+  bool numbers = true;
+  bool symbols = false;
 
   void generateRandomPassword() {
+    print(symbols);
     _generatedPassword = _passwordGenerator.randomPassword(
         passwordLength: length.toDouble(),
         letters: lowercase,
