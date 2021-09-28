@@ -115,14 +115,14 @@ class SettingsForm extends ConsumerWidget {
             RangeTextFormField(
               labelText: 'Length of Password',
               intValueSetter: (value) =>
-                  context.read(randomizerProvider).length = value,
+                  context.read(randomizerProvider.notifier).setLength(value),
               initialValue: context.read(randomizerProvider).length,
             ),
             SizedBox(height: 12),
             CheckboxSettingFormField(
               labelText: 'Lowercase Letters',
               boolValueSetter: (value) => {
-                ref(randomizerProvider).lowercase = value,
+                context.read(randomizerProvider.notifier).setLowercase(value),
                 InitialDataSettings.lowercase = value
               },
               initialValue: InitialDataSettings.lowercase,
@@ -130,29 +130,27 @@ class SettingsForm extends ConsumerWidget {
             CheckboxSettingFormField(
                 labelText: 'Uppercase Letters',
                 boolValueSetter: (value) => {
-                      ref(randomizerProvider).uppercase = value,
+                      context
+                          .read(randomizerProvider.notifier)
+                          .setUppercase(value),
                       InitialDataSettings.uppercase = value
                     },
                 initialValue: ref(randomizerProvider).uppercase),
-/*            CheckboxListTile(
-              value: ref(randomizerProvider).symbols,
-              onChanged: (value) =>
-                  {ref(randomizerProvider).symbols = value ?? false},
-              title: Text('Symbols'),
-            ),*/
             CheckboxSettingFormField(
                 labelText: 'Symbols',
                 boolValueSetter: (value) => {
-                      ref(randomizerProvider).symbols = value,
-                      context.read(randomizerProvider).symbols = value,
+                      context
+                          .read(randomizerProvider.notifier)
+                          .setSymbols(value),
                       InitialDataSettings.symbols = value,
                     },
                 initialValue: ref(randomizerProvider).symbols),
             CheckboxSettingFormField(
                 labelText: 'Numbers',
                 boolValueSetter: (value) => {
-                      ref(randomizerProvider).numbers = value,
-                      context.read(randomizerProvider).numbers = value,
+                      context
+                          .read(randomizerProvider.notifier)
+                          .setNumbers(value),
                       InitialDataSettings.numbers = value
                     },
                 initialValue: InitialDataSettings.numbers),

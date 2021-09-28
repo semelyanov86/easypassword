@@ -10,7 +10,6 @@ class RandomizerPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final randomizer = ref(randomizerProvider);
-    print(randomizer.symbols);
     return Scaffold(
       appBar: AppBar(
         title: Text('Password Randomizer'),
@@ -23,8 +22,9 @@ class RandomizerPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Generate Password'),
-        onPressed: () =>
-            {context.read(randomizerProvider).generateRandomPassword()},
+        onPressed: () => {
+          context.read(randomizerProvider.notifier).generateRandomPassword()
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
